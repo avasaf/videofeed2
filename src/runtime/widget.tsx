@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { React, AllWidgetProps, jsx, css, type IMThemeVariables, type SerializedStyles } from 'jimu-core'
 import { type IMConfig } from './config'
-import Hls from 'hls.js'
+import Hls from './lib/hls.min.js'
 
 export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>, unknown> {
   // Create a reference to the <video> DOM element
@@ -71,6 +71,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     const baseStyle = css`
       width: 100%;
       height: 100%;
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -102,10 +103,10 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
           controls
           autoPlay
           muted
-          style={{ width: '100%', height: '100%' }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
         />
         {!config.videoUrl && (
-          <span style={{ color: '#fff', position: 'absolute' }}>
+          <span style={{ color: '#fff', zIndex: 1 }}>
             Please configure the video URL in the widget settings.
           </span>
         )}
