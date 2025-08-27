@@ -46,8 +46,20 @@ export default class Widget extends React.PureComponent<AllWidgetProps<IMConfig>
     // Check if the URL is an HLS stream
     if (videoUrl.includes('.m3u8')) {
       if (Hls.isSupported()) {
-        this.hls = new Hls()
-        this.hls.loadSource(videoUrl)
+        const url = new URL(videoUrl)
+        const qs = url.search
+        const baseUrl = `${url.origin}${url.pathname}`
+        class QueryLoader extends Hls.DefaultConfig.loader {
+          load (context, cfg, callbacks) {
+            if (qs) {
+              const sep = context.url.includes('?') ? '&' : '?'
+              context.url = `${context.url}${sep}${qs.slice(1)}`
+            }
+            super.load(context, cfg, callbacks)
+          }
+        }
+        this.hls = new Hls({ loader: QueryLoader })
+        this.hls.loadSource(baseUrl)
         this.hls.attachMedia(videoElement)
         // Optional: Auto-play when the manifest is parsed
         this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
